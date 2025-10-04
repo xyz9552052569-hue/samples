@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10th Standard MH Board Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* blue-500 */
+            --primary-hover: #2563eb; /* blue-600 */
+            --secondary-bg: #f3f4f6; /* gray-100 */
+            --card-bg: #ffffff;
+            --text-primary: #1f2937; /* gray-800 */
+            --text-secondary: #4b5563; /* gray-600 */
+            --border-color: #e5e7eb; /* gray-200 */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+        }
+        .sidebar-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .sidebar-link.active, .sidebar-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .sidebar-link.active svg, .sidebar-link:hover svg {
+            color: white;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        /* Flashcard styles */
+        .flashcard {
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard-face {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+        .quiz-option:hover {
+            background-color: #dbeafe; /* blue-100 */
+        }
+        .quiz-option.selected {
+            background-color: #93c5fd; /* blue-300 */
+            border-color: var(--primary-color);
+        }
+        .quiz-option.correct {
+            background-color: #dcfce7; /* green-100 */
+            border-color: #22c55e; /* green-500 */
+        }
+        .quiz-option.incorrect {
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col fixed h-full md:relative">
+        <div class="h-16 flex items-center justify-center border-b border-gray-200">
+            <h1 class="text-xl font-bold text-blue-600">MH Board Pro</h1>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="#" onclick="showSection('dashboard', this)" class="sidebar-link active flex items-center px-4 py-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
+                Dashboard
+            </a>
+            <a href="#" onclick="showSection('flashcards', this)" class="sidebar-link flex items-center px-4 py-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0114.5 16c1.255 0 2.443-.29 3.5-.804v-10A7.968 7.968 0 0014.5 4z" /></svg>
+                Flashcards
+            </a>
+            <a href="#" onclick="showSection('quizzes', this)" class="sidebar-link flex items-center px-4 py-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" /></svg>
+                Quizzes
+            </a>
+            <a href="#" onclick="showSection('lectures', this)" class="sidebar-link flex items-center px-4 py-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 001.553.832l3-2a1 1 0 000-1.664l-3-2z" /></svg>
+                Lectures
+            </a>
+             <a href="#" onclick="showSection('sample-papers', this)" class="sidebar-link flex items-center px-4 py-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" /></svg>
+                Sample Papers
+            </a>
+            <a href="#" onclick="showSection('pyq', this)" class="sidebar-link flex items-center px-4 py-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clip-rule="evenodd" /></svg>
+                Previous Year Papers
+            </a>
+            <a href="#" onclick="showSection('mind-maps', this)" class="sidebar-link flex items-center px-4 py-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 00-1.414 1.414L12 7.414V10a1 1 0 102 0V4a1 1 0 00-1-1h-2z" /><path d="M4 5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V11a1 1 0 10-2 0v6H4V7h6a1 1 0 100-2H4z" /></svg>
+                Mind Maps
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 bg-gray-100 p-6 md:p-8 lg:p-10 overflow-y-auto">
+        
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section active">
+            <h2 class="text-3xl font-bold mb-6">Dashboard</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Science Card -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-4">Science</h3>
+                    <p class="text-gray-600 mb-4">Physics, Chemistry, and Biology concepts made easy. Explore chapters, take quizzes, and master the syllabus.</p>
+                    <button onclick="showSection('quizzes', document.querySelector('.sidebar-link[onclick*=\'quizzes\']'))" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">Start Learning</button>
+                </div>
+                <!-- Maths Card -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-4">Maths</h3>
+                    <p class="text-gray-600 mb-4">Algebra and Geometry simplified. Practice with sample papers and use flashcards for quick formula revision.</p>
+                    <button onclick="showSection('flashcards', document.querySelector('.sidebar-link[onclick*=\'flashcards\']'))" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">Start Revising</button>
+                </div>
+            </div>
+             <div class="mt-8 bg-white p-6 rounded-lg shadow-sm">
+                <h3 class="text-xl font-semibold mb-4">Quick Access</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div onclick="showSection('flashcards', this)" class="text-center p-4 border rounded-lg hover:shadow-md cursor-pointer">Flashcards</div>
+                    <div onclick="showSection('quizzes', this)" class="text-center p-4 border rounded-lg hover:shadow-md cursor-pointer">Quizzes</div>
+                    <div onclick="showSection('lectures', this)" class="text-center p-4 border rounded-lg hover:shadow-md cursor-pointer">Lectures</div>
+                    <div onclick="showSection('sample-papers', this)" class="text-center p-4 border rounded-lg hover:shadow-md cursor-pointer">Sample Papers</div>
+                    <div onclick="showSection('mind-maps', this)" class="text-center p-4 border rounded-lg hover:shadow-md cursor-pointer">Mind Maps</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flashcards Section -->
+        <div id="flashcards" class="content-section">
+            <h2 class="text-3xl font-bold mb-6">Flashcards</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="flashcard-container">
+                <!-- Flashcards will be dynamically inserted here -->
+            </div>
+        </div>
+        
+        <!-- Quizzes Section -->
+        <div id="quizzes" class="content-section">
+            <h2 class="text-3xl font-bold mb-6">Quizzes</h2>
+            <div id="quiz-container" class="bg-white p-6 rounded-lg shadow-sm max-w-2xl mx-auto">
+                 <!-- Quiz content will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Lectures Section -->
+        <div id="lectures" class="content-section">
+            <h2 class="text-3xl font-bold mb-6">Lectures</h2>
+            <div class="space-y-4">
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <h3 class="font-semibold">Science: Gravitation - Full Chapter</h3>
+                    <p class="text-sm text-gray-500 mb-2">A detailed explanation of gravitational force, Kepler's laws, and escape velocity.</p>
+                    <a href="#" class="text-blue-500 hover:underline">Watch Video &rarr;</a>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <h3 class="font-semibold">Maths: Linear Equations in Two Variables</h3>
+                    <p class="text-sm text-gray-500 mb-2">Learn to solve linear equations using various methods like substitution and elimination.</p>
+                    <a href="#" class="text-blue-500 hover:underline">Watch Video &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Papers Section -->
+        <div id="sample-papers" class="content-section">
+            <h2 class="text-3xl font-bold mb-6">Sample Papers</h2>
+            <div class="space-y-4">
+                <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center">
+                    <div>
+                        <h3 class="font-semibold">Science - Sample Paper 1</h3>
+                        <p class="text-sm text-gray-500">Based on the latest MH Board pattern.</p>
+                    </div>
+                    <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Download</a>
+                </div>
+                 <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center">
+                    <div>
+                        <h3 class="font-semibold">Maths (Algebra) - Sample Paper 1</h3>
+                        <p class="text-sm text-gray-500">Practice questions for algebra topics.</p>
+                    </div>
+                    <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Download</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Previous Year Question Section -->
+        <div id="pyq" class="content-section">
+            <h2 class="text-3xl font-bold mb-6">Previous Year Papers</h2>
+            <div class="space-y-4">
+                <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center">
+                    <div>
+                        <h3 class="font-semibold">Science - March 2023 Board Paper</h3>
+                        <p class="text-sm text-gray-500">Official question paper from the previous year.</p>
+                    </div>
+                    <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Download</a>
+                </div>
+                 <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center">
+                    <div>
+                        <h3 class="font-semibold">Maths (Geometry) - March 2023 Board Paper</h3>
+                        <p class="text-sm text-gray-500">Official question paper from the previous year.</p>
+                    </div>
+                    <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Download</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mind Maps Section -->
+        <div id="mind-maps" class="content-section">
+            <h2 class="text-3xl font-bold mb-6">Mind Maps</h2>
+            <div class="space-y-4">
+                 <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center">
+                    <div>
+                        <h3 class="font-semibold">Science: Carbon Compounds</h3>
+                        <p class="text-sm text-gray-500">A visual summary of hydrocarbons, functional groups, and nomenclature.</p>
+                    </div>
+                    <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">View Map</a>
+                </div>
+                 <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center">
+                    <div>
+                        <h3 class="font-semibold">Maths: Pythagoras Theorem</h3>
+                        <p class="text-sm text-gray-500">A diagrammatic representation of the theorem and its applications.</p>
+                    </div>
+                    <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">View Map</a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- DATA ---
+        const flashcardsData = [
+            { subject: 'Science', q: 'What is the SI unit of gravitational constant (G)?', a: 'Nm²/kg²' },
+            { subject: 'Science', q: 'What is the chemical formula for rust?', a: 'Fe₂O₃·nH₂O (Hydrated Iron(III) Oxide)' },
+            { subject: 'Maths', q: 'What is the formula for the discriminant (Δ) of a quadratic equation ax² + bx + c = 0?', a: 'Δ = b² - 4ac' },
+            { subject: 'Maths', q: 'State the Pythagoras theorem.', a: 'In a right-angled triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides.' },
+            { subject: 'Science', q: 'Which lens is used to correct myopia (nearsightedness)?', a: 'Concave lens' },
+            { subject: 'Maths', q: 'What is the probability of a sure event?', a: '1' },
+        ];
+
+        const quizData = [
+            {
+                question: 'The modern periodic law is based on the atomic ______ of an element.',
+                options: ['Mass', 'Number', 'Radius', 'Valency'],
+                answer: 'Number'
+            },
+            {
+                question: 'In the equation 3x + 2y = 13, if y = 2, what is the value of x?',
+                options: ['1', '2', '3', '4'],
+                answer: '3'
+            },
+            {
+                question: 'Which of the following is an example of an endothermic reaction?',
+                options: ['Burning of coal', 'Decomposition of vegetable matter', 'Photosynthesis', 'Respiration'],
+                answer: 'Photosynthesis'
+            }
+        ];
+        
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = [];
+
+
+        // --- UI FUNCTIONS ---
+        function showSection(sectionId, element) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show the target section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Update active link in sidebar
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // If the clicked element is a sidebar link, add active class.
+            // This check prevents errors when calling from dashboard buttons.
+            if(element && element.classList.contains('sidebar-link')) {
+                 element.classList.add('active');
+            }
+        }
+
+        // --- FLASHCARD LOGIC ---
+        function createFlashcards() {
+            const container = document.getElementById('flashcard-container');
+            container.innerHTML = '';
+            flashcardsData.forEach(data => {
+                const cardWrapper = document.createElement('div');
+                cardWrapper.className = 'w-full h-48 perspective';
+                
+                const card = document.createElement('div');
+                card.className = 'flashcard relative w-full h-full';
+                
+                card.innerHTML = `
+                    <div class="flashcard-face absolute w-full h-full p-4 rounded-lg shadow-md bg-white border border-gray-200 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-semibold uppercase text-blue-500">${data.subject}</span>
+                            <p class="mt-2 text-lg">${data.q}</p>
+                        </div>
+                        <p class="text-sm text-gray-400 self-end">Click to flip</p>
+                    </div>
+                    <div class="flashcard-back absolute w-full h-full p-4 rounded-lg shadow-md bg-blue-500 text-white flex flex-col justify-center items-center">
+                        <p class="text-lg text-center font-semibold">${data.a}</p>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    card.classList.toggle('flipped');
+                });
+                
+                cardWrapper.appendChild(card);
+                container.appendChild(cardWrapper);
+            });
+        }
+        
+        // --- QUIZ LOGIC ---
+        function loadQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = Array(quizData.length).fill(null);
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const quizContainer = document.getElementById('quiz-container');
+            if (currentQuestionIndex < quizData.length) {
+                const questionData = quizData[currentQuestionIndex];
+                let optionsHtml = '';
+                questionData.options.forEach((option, index) => {
+                    optionsHtml += `<div class="quiz-option border-2 border-gray-200 p-3 rounded-lg cursor-pointer" onclick="selectOption(this, '${option}')">${option}</div>`;
+                });
+
+                quizContainer.innerHTML = `
+                    <div class="mb-4">
+                        <p class="text-gray-600">Question ${currentQuestionIndex + 1} of ${quizData.length}</p>
+                        <h3 class="text-xl font-semibold mt-1">${questionData.question}</h3>
+                    </div>
+                    <div class="space-y-3 mb-6" id="quiz-options">
+                        ${optionsHtml}
+                    </div>
+                    <button class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition" onclick="submitAnswer()">Next</button>
+                `;
+            } else {
+                showResults();
+            }
+        }
+
+        function selectOption(element, option) {
+            // Remove 'selected' from all options
+            document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+            // Add 'selected' to the clicked one
+            element.classList.add('selected');
+            userAnswers[currentQuestionIndex] = option;
+        }
+
+        function submitAnswer() {
+            if (userAnswers[currentQuestionIndex] === null) {
+                alert("Please select an answer!");
+                return;
+            }
+
+            const correctAnswer = quizData[currentQuestionIndex].answer;
+            if (userAnswers[currentQuestionIndex] === correctAnswer) {
+                score++;
+            }
+            
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        function showResults() {
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = `
+                <h3 class="text-2xl font-bold text-center mb-4">Quiz Complete!</h3>
+                <p class="text-center text-lg mb-6">You scored ${score} out of ${quizData.length}</p>
+                <div class="text-center">
+                    <button class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition" onclick="loadQuiz()">Try Again</button>
+                </div>
+            `;
+        }
+
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            showSection('dashboard', document.querySelector('.sidebar-link'));
+            createFlashcards();
+            loadQuiz();
+        };
+    </script>
+</body>
+</html>
